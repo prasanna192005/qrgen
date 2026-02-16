@@ -1,13 +1,39 @@
 import { useState, useRef } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
-import { Download, Upload, X } from 'lucide-react';
+import { Download, Upload, X, Globe, User } from 'lucide-react';
 
 function App() {
+  const [mode, setMode] = useState<'url' | 'vcard'>('url');
   const [url, setUrl] = useState('https://example.com');
+  const [vCard, setVCard] = useState({
+    firstName: '',
+    lastName: '',
+    phone: '',
+    email: '',
+    company: '',
+    jobTitle: '',
+    website: '',
+  });
   const [logo, setLogo] = useState<string | null>(null);
   const [qrSize, setQrSize] = useState(256);
   const [logoSize, setLogoSize] = useState(50);
   const qrRef = useRef<HTMLDivElement>(null);
+
+  const generateVCardString = () => {
+    const { firstName, lastName, phone, email, company, jobTitle, website } = vCard;
+    return `BEGIN:VCARD
+VERSION:3.0
+N:${lastName};${firstName};;;
+FN:${firstName} ${lastName}
+ORG:${company}
+TITLE:${jobTitle}
+TEL;TYPE=CELL:${phone}
+EMAIL:${email}
+URL:${website}
+END:VCARD`;
+  };
+
+  const qrValue = mode === 'url' ? url : generateVCardString();
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -59,19 +85,91 @@ function App() {
                 Settings
               </h2>
 
+              <div className="flex bg-slate-100 p-1 rounded-lg mb-6">
+                <button
+                  onClick={() => setMode('url')}
+                  className={`flex-1 flex items-center justify-center py-2 px-4 rounded-md text-sm font-medium transition ${mode === 'url'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                >
+                  <Globe className="w-4 h-4 mr-2" />
+                  URL
+                </button>
+                <button
+                  onClick={() => setMode('vcard')}
+                  className={`flex-1 flex items-center justify-center py-2 px-4 rounded-md text-sm font-medium transition ${mode === 'vcard'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  vCard
+                </button>
+              </div>
+
               <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    URL or Text
-                  </label>
-                  <input
-                    type="text"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    placeholder="Enter URL or text"
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                  />
-                </div>
+                {mode === 'url' ? (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      URL or Text
+                    </label>
+                    <input
+                      type="text"
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      placeholder="Enter URL or text"
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                    />
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-1">
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        First Name
+                      </label>
+                      <input
+                        type="text"
+                        value={vCard.firstName}
+                        onChange={(e) => setVCard({ ...vCard, firstName: e.target.value })}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm"
+                      />
+                    </div>
+                    <div className="col-span-1">
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        value={vCard.lastName}
+                        onChange={(e) => setVCard({ ...vCard, lastName: e.target.value })}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm"
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        value={vCard.phone}
+                        onChange={(e) => setVCard({ ...vCard, phone: e.target.value })}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm"
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        value={vCard.email}
+                        onChange={(e) => setVCard({ ...vCard, email: e.target.value })}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm"
+                      />
+                    </div>
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -162,7 +260,7 @@ function App() {
               <div className="flex items-center justify-center p-8 bg-slate-50 rounded-lg">
                 <div className="relative" ref={qrRef}>
                   <QRCodeCanvas
-                    value={url}
+                    value={qrValue}
                     size={qrSize}
                     level="H"
                     includeMargin={true}
