@@ -28,51 +28,16 @@ function App() {
     const canvas = qrRef.current?.querySelector('canvas');
     if (!canvas) return;
 
-    const finalCanvas = document.createElement('canvas');
-    const ctx = finalCanvas.getContext('2d');
-    if (!ctx) return;
-
-    finalCanvas.width = qrSize;
-    finalCanvas.height = qrSize;
-
-    ctx.drawImage(canvas, 0, 0);
-
-    if (logo) {
-      const logoImg = new Image();
-      logoImg.onload = () => {
-        const logoSizePixels = (logoSize / 100) * qrSize;
-        const x = (qrSize - logoSizePixels) / 2;
-        const y = (qrSize - logoSizePixels) / 2;
-
-        ctx.fillStyle = 'white';
-        ctx.fillRect(x - 10, y - 10, logoSizePixels + 20, logoSizePixels + 20);
-
-        ctx.drawImage(logoImg, x, y, logoSizePixels, logoSizePixels);
-
-        finalCanvas.toBlob((blob) => {
-          if (blob) {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'qrcode.png';
-            link.click();
-            URL.revokeObjectURL(url);
-          }
-        });
-      };
-      logoImg.src = logo;
-    } else {
-      finalCanvas.toBlob((blob) => {
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = 'qrcode.png';
-          link.click();
-          URL.revokeObjectURL(url);
-        }
-      });
-    }
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'qrcode.png';
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+    });
   };
 
   return (
@@ -201,23 +166,19 @@ function App() {
                     size={qrSize}
                     level="H"
                     includeMargin={true}
+                    imageSettings={
+                      logo
+                        ? {
+                          src: logo,
+                          x: undefined,
+                          y: undefined,
+                          height: (logoSize / 100) * qrSize,
+                          width: (logoSize / 100) * qrSize,
+                          excavate: true,
+                        }
+                        : undefined
+                    }
                   />
-                  {logo && (
-                    <div
-                      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-                      style={{
-                        width: `${(logoSize / 100) * qrSize}px`,
-                        height: `${(logoSize / 100) * qrSize}px`,
-                      }}
-                    >
-                      <div className="absolute inset-0 bg-white rounded-sm -m-2"></div>
-                      <img
-                        src={logo}
-                        alt="Logo overlay"
-                        className="relative z-10 w-full h-full object-contain"
-                      />
-                    </div>
-                  )}
                 </div>
               </div>
 
