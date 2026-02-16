@@ -1,9 +1,9 @@
 import { useState, useRef } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
-import { Download, Upload, X, Globe, User } from 'lucide-react';
+import { Download, Upload, X, Globe, User, MessageSquare } from 'lucide-react';
 
 function App() {
-  const [mode, setMode] = useState<'url' | 'vcard'>('url');
+  const [mode, setMode] = useState<'url' | 'vcard' | 'whatsapp'>('url');
   const [url, setUrl] = useState('https://example.com');
   const [vCard, setVCard] = useState({
     firstName: '',
@@ -13,6 +13,10 @@ function App() {
     company: '',
     jobTitle: '',
     website: '',
+  });
+  const [whatsapp, setWhatsapp] = useState({
+    phone: '',
+    message: '',
   });
   const [logo, setLogo] = useState<string | null>(null);
   const [qrSize, setQrSize] = useState(256);
@@ -33,7 +37,19 @@ URL:${website}
 END:VCARD`;
   };
 
-  const qrValue = mode === 'url' ? url : generateVCardString();
+  const generateWhatsAppLink = () => {
+    const { phone, message } = whatsapp;
+    // Remove any non-numeric characters from phone number
+    const cleanPhone = phone.replace(/\D/g, '');
+    const encodedMessage = encodeURIComponent(message);
+    return `https://wa.me/${cleanPhone}${message ? `?text=${encodedMessage}` : ''}`;
+  };
+
+  const qrValue = mode === 'url'
+    ? url
+    : mode === 'vcard'
+      ? generateVCardString()
+      : generateWhatsAppLink();
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -106,6 +122,16 @@ END:VCARD`;
                   <User className="w-4 h-4 mr-2" />
                   vCard
                 </button>
+                <button
+                  onClick={() => setMode('whatsapp')}
+                  className={`flex-1 flex items-center justify-center py-2 px-4 rounded-md text-sm font-medium transition ${mode === 'whatsapp'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  WhatsApp
+                </button>
               </div>
 
               <div className="space-y-6">
@@ -121,6 +147,33 @@ END:VCARD`;
                       placeholder="Enter URL or text"
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                     />
+                  </div>
+                ) : mode === 'whatsapp' ? (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        WhatsApp Number (with country code)
+                      </label>
+                      <input
+                        type="tel"
+                        value={whatsapp.phone}
+                        onChange={(e) => setWhatsapp({ ...whatsapp, phone: e.target.value })}
+                        placeholder="e.g. 919876543210"
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Pre-filled Message (optional)
+                      </label>
+                      <textarea
+                        value={whatsapp.message}
+                        onChange={(e) => setWhatsapp({ ...whatsapp, message: e.target.value })}
+                        placeholder="Hello! I'm interested in..."
+                        rows={3}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm resize-none"
+                      />
+                    </div>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-4">
