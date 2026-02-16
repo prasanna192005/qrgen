@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
-import { Download, Upload, X, Globe, User, MessageSquare } from 'lucide-react';
+import { Download, Upload, X, Globe, User, MessageSquare, Copy, Check } from 'lucide-react';
 
 function App() {
   const [mode, setMode] = useState<'url' | 'vcard' | 'whatsapp'>('url');
@@ -21,6 +21,7 @@ function App() {
   const [logo, setLogo] = useState<string | null>(null);
   const [qrSize, setQrSize] = useState(256);
   const [logoSize, setLogoSize] = useState(50);
+  const [copied, setCopied] = useState(false);
   const qrRef = useRef<HTMLDivElement>(null);
 
   const generateVCardString = () => {
@@ -80,6 +81,23 @@ END:VCARD`;
         URL.revokeObjectURL(url);
       }
     });
+  };
+
+  const copyToClipboard = async () => {
+    const canvas = qrRef.current?.querySelector('canvas');
+    if (!canvas) return;
+
+    try {
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        const data = [new ClipboardItem({ 'image/png': blob })];
+        await navigator.clipboard.write(data);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }, 'image/png');
+    } catch (err) {
+      console.error('Failed to copy image: ', err);
+    }
   };
 
   return (
@@ -297,10 +315,30 @@ END:VCARD`;
 
                 <button
                   onClick={downloadQR}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center transition shadow-sm"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center transition shadow-sm mb-3"
                 >
                   <Download className="w-5 h-5 mr-2" />
                   Download PNG
+                </button>
+
+                <button
+                  onClick={copyToClipboard}
+                  className={`w-full font-medium py-3 px-4 rounded-lg flex items-center justify-center transition shadow-sm border ${copied
+                    ? 'bg-green-50 border-green-200 text-green-600'
+                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                    }`}
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-5 h-5 mr-2" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-5 h-5 mr-2" />
+                      Copy to Clipboard
+                    </>
+                  )}
                 </button>
               </div>
             </div>
