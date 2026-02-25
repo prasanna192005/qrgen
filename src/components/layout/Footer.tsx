@@ -4,7 +4,7 @@ export const Footer = () => {
             <div className="max-w-[1440px] mx-auto px-10 flex flex-col md:flex-row justify-between items-center gap-6">
                 <div className="flex items-center space-x-2">
                     <span className="text-xl font-black tracking-tighter text-slate-900">qr<span className="text-blue-600">19</span></span>
-                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest ml-4">© 2026 Engineering Division</span>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest ml-4">© 2026 YAAO PRODUCTIONS</span>
                 </div>
 
                 <div className="flex items-center space-x-10">
