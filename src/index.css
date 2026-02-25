@@ -1,22 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-    .custom-scrollbar::-webkit-scrollbar {
-        width: 4px;
+@layer base {
+    body {
+        @apply antialiased text-slate-900 bg-[#F8FAFC];
+        font-family: 'Inter', sans-serif;
+        background-image:
+            linear-gradient(rgba(226, 232, 240, 0.4) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(226, 232, 240, 0.4) 1px, transparent 1px);
+        background-size: 40px 40px;
     }
 
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: transparent;
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: 'Outfit', sans-serif;
+    }
+}
+
+@layer components {
+    .floating-input-group {
+        @apply relative mb-6;
     }
 
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #e2e8f0;
-        border-radius: 10px;
+    .floating-input {
+        @apply w-full px-5 py-4 bg-white border border-slate-200 rounded-xl outline-none transition-all duration-300 placeholder-transparent focus:border-slate-900 shadow-sm focus:shadow-blue-900/5;
     }
 
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #cbd5e1;
+    .floating-label {
+        @apply absolute left-5 top-4 text-slate-400 pointer-events-none transition-all duration-300 text-sm font-medium tracking-tight;
     }
+
+    .floating-input:focus~.floating-label,
+    .floating-input:not(:placeholder-shown)~.floating-label {
+        @apply -top-2.5 left-4 text-[10px] font-black uppercase tracking-widest text-slate-900 bg-white px-1.5;
+    }
+
+    /* Studio Shadow System */
+    .shadow-studio {
+        box-shadow:
+            0 1px 2px 0 rgba(0, 0, 0, 0.05),
+            0 4px 6px -1px rgba(0, 0, 0, 0.02),
+            0 10px 15px -3px rgba(0, 0, 0, 0.01);
+    }
+
+    .shadow-studio-xl {
+        box-shadow:
+            0 2px 4px 0 rgba(0, 0, 0, 0.05),
+            0 12px 24px -6px rgba(0, 0, 0, 0.03),
+            0 24px 48px -12px rgba(0, 0, 0, 0.02);
+    }
+
+    .qr-regenerate-fade {
+        animation: qrFade 0.4s ease-out;
+    }
+
+    @keyframes qrFade {
+        0% {
+            opacity: 0;
+            transform: scale(0.99) translateY(2px);
+        }
+
+        100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+}
+
+/* Scrollbar refinement */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
 }

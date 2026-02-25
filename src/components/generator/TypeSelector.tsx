@@ -1,45 +1,52 @@
-import { Globe, User, MessageSquare, Mail, Smartphone, Calendar } from 'lucide-react';
-import { QRMode } from '../../types';
+import { QRMode, QRType } from '../../types';
 
 interface TypeSelectorProps {
-    mode: QRMode;
-    setMode: (mode: QRMode) => void;
+    mode: QRType;
+    setMode: (mode: QRType) => void;
+    modes: QRMode[];
 }
 
-export const TypeSelector = ({ mode, setMode }: TypeSelectorProps) => {
-    const items = [
-        { id: 'url', label: 'Website URL', icon: Globe },
-        { id: 'vcard', label: 'Contact Card', icon: User },
-        { id: 'whatsapp', label: 'WhatsApp', icon: MessageSquare },
-        { id: 'email', label: 'Send Email', icon: Mail },
-        { id: 'sms', label: 'Text Message', icon: Smartphone },
-        { id: 'calendar', label: 'Event Link', icon: Calendar },
-    ];
-
+export const TypeSelector = ({ mode, setMode, modes }: TypeSelectorProps) => {
     return (
-        <section>
-            <div className="flex items-center space-x-3 mb-6">
-                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-200">
-                    <Globe className="w-4 h-4 text-white" />
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+            <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                    <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 font-inter">01 / Selection</h2>
+                    <p className="text-xl font-bold text-slate-900 font-outfit">Choose Protocol</p>
                 </div>
-                <h2 className="text-lg font-bold text-slate-900">Choose Content Type</h2>
             </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                {modes.map((type) => {
+                    const Icon = type.icon;
+                    const isActive = mode === type.id;
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {items.map((item) => (
-                    <button
-                        key={item.id}
-                        onClick={() => setMode(item.id as QRMode)}
-                        className={`relative p-5 rounded-2xl border-2 text-left transition-all duration-300 group ${mode === item.id
-                                ? 'bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-100 translate-y-[-2px]'
-                                : 'bg-white border-slate-100 text-slate-600 hover:border-blue-200 hover:bg-slate-50'
-                            }`}
-                    >
-                        <item.icon className={`w-6 h-6 mb-3 transition-transform duration-300 ${mode === item.id ? 'scale-110 text-white' : 'text-slate-400 group-hover:scale-110 group-hover:text-blue-500'}`} />
-                        <span className="block text-sm font-bold tracking-tight">{item.label}</span>
-                    </button>
-                ))}
+                    return (
+                        <button
+                            key={type.id}
+                            onClick={() => setMode(type.id)}
+                            className={`group relative flex flex-col items-start p-8 rounded-2xl transition-all duration-300 ${isActive
+                                    ? 'bg-slate-900 text-white shadow-studio-xl -translate-y-1'
+                                    : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-900 hover:-translate-y-1 hover:shadow-studio'
+                                }`}
+                        >
+                            <div className={`mb-6 p-4 rounded-xl transition-colors duration-300 ${isActive ? 'bg-blue-600 text-white' : 'bg-slate-50 text-slate-400 group-hover:bg-slate-100 group-hover:text-slate-900'
+                                }`}>
+                                <Icon className="w-6 h-6" />
+                            </div>
+                            <div className="text-left">
+                                <span className="block text-lg font-bold mb-1 tracking-tight font-outfit">{type.label}</span>
+                                <span className={`text-xs font-medium leading-relaxed transition-colors ${isActive ? 'text-slate-400' : 'text-slate-400'
+                                    }`}>
+                                    {type.description}
+                                </span>
+                            </div>
+                            {isActive && (
+                                <div className="absolute top-6 right-6 w-2 h-2 rounded-full bg-blue-500" />
+                            )}
+                        </button>
+                    );
+                })}
             </div>
-        </section>
+        </div>
     );
 };

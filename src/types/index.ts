@@ -1,4 +1,13 @@
-export type QRMode = 'url' | 'vcard' | 'whatsapp' | 'email' | 'sms' | 'calendar';
+export type QRType = 'url' | 'vcard' | 'whatsapp' | 'email' | 'sms' | 'event';
+export type QRFormat = 'png' | 'svg';
+export type DotStyle = 'square' | 'rounded';
+
+export interface QRMode {
+    id: QRType;
+    label: string;
+    description: string;
+    icon: any;
+}
 
 export interface VCardData {
     firstName: string;
@@ -6,13 +15,7 @@ export interface VCardData {
     phone: string;
     email: string;
     company: string;
-    jobTitle: string;
     website: string;
-}
-
-export interface WhatsAppData {
-    phone: string;
-    message: string;
 }
 
 export interface EmailData {
@@ -26,10 +29,9 @@ export interface SMSData {
     message: string;
 }
 
-export interface CalendarData {
+export interface EventData {
     title: string;
     location: string;
-    startTime: string;
-    endTime: string;
+    startDate: string;
     description: string;
 }
